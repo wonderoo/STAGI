@@ -7,6 +7,7 @@ from tqdm import tqdm
 
 from model.modelsAGI import ur_vit_base_patch16
 from utils.utils import load_config, load_files, build_train_data, evaluation, init_seed, init_logging, output
+from model.baseline.over_average_is_right import over_average_is_right
 
 
 def train(model, train_data, optimizer, scheduler, epoch, phase):
@@ -59,6 +60,16 @@ def main(args):
     files = load_files(config['file_path'])
 
     train_data, val_data, test_data = build_train_data(files, args.batch_size, args.gpu)
+
+    # cyo_baselines
+    if config[args.baseline] == "all":
+        over_average_is_right(train_data, val_data, test_data, files)
+    elif config[args.baseline] == "all_b":
+        over_average_is_right(train_data, val_data, test_data, files)
+        return
+    elif config[args.baseline] == "over_average_is_right":
+        over_average_is_right(train_data, val_data, test_data, files)
+        return
 
     model = ur_vit_base_patch16(config['N']).to(args.gpu)
 
@@ -133,6 +144,12 @@ if __name__ == "__main__":
                         type=str,
                         help='name of the model',
                         default="test")
+
+    # cyo : all --运行所有baseline+model  no --不运行  baseline_name 运行某个+不运行模型 all_base --运行所有baseline
+    parser.add_argument('--baseline',
+                        type=str,
+                        help='run which baseline',
+                        default="all")
 
     args = parser.parse_args()
 

@@ -1,7 +1,13 @@
 import numpy as np
 import pandas as pd
 from shapely.geometry import Point, Polygon
+import os
 
+directory = "../regression_data/"
+if os.path.exists(directory):
+    print("路径存在:", directory)
+else:
+    print("路径不存在:", directory)
 # read the csv from taxi_zones.csv
 with open('taxi_zones.csv', 'r') as f:
     csv = pd.read_csv(f)
@@ -44,9 +50,11 @@ with open('Point_Of_Interest.csv', 'r') as f:
                 res_tables[now_pair][j] += 1
 cnt = 0
 for key in res_tables:
+    print(str(key[0]) + "-" + str(key[1]) + ".npy")
     name = str(key[0]) + "-" + str(key[1]) + ".npy"
     print(len(res_tables[key]))
     if np.sum(res_tables[key]) >= 10:
         np.save("../regression_data/" + name, res_tables[key])
         cnt += 1
 print(cnt)
+
